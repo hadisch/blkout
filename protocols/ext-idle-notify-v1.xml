@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="ext_idle_notify_v1">
+  <copyright>
+    Copyright © 2015 Martin Gräßlin
+    Copyright © 2022 Simon Ser
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice (including the next
+    paragraph) shall be included in all copies or substantial portions of the
+    Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+  </copyright>
+
+  <interface name="ext_idle_notifier_v1" version="1">
+    <description summary="get notified about user idle status">
+      This interface allows clients to monitor user idle status.
+
+      After binding the client will receive the current idle status immediately.
+      Future idle status changes will be sent as events.
+
+      Warning! The protocol described in this file is currently in the testing
+      phase. Backward compatible changes may be added together with the
+      corresponding interface version bump. Backward incompatible changes can
+      only be done by creating a new major version of the extension.
+    </description>
+
+    <request name="destroy" type="destructor">
+      <description summary="destroy the manager object">
+        Destroy the manager object. All objects created via this interface
+        remain valid.
+      </description>
+    </request>
+
+    <request name="get_idle_notification">
+      <description summary="create a notification object">
+        Create a new idle notification object.
+
+        The notification object has a minimum timeout duration and is tied to a
+        seat. The client will be notified if the seat is inactive for at least
+        the provided timeout. See ext_idle_notification_v1 for more details.
+
+        A zero timeout is invalid and must result in a protocol error.
+      </description>
+      <arg name="id" type="new_id" interface="ext_idle_notification_v1"/>
+      <arg name="timeout" type="uint" summary="minimum idle timeout in msec"/>
+      <arg name="seat" type="object" interface="wl_seat"/>
+    </request>
+
+    <enum name="error">
+      <entry name="invalid_timeout" value="0"
+             summary="the timeout is invalid"/>
+    </enum>
+  </interface>
+
+  <interface name="ext_idle_notification_v1" version="1">
+    <description summary="get notified about user idle status">
+      This interface is used by the compositor to send idle notification events
+      to clients.
+
+      Initially the notification object is not idle. The notification object
+      becomes idle when the associated seat has not received any user activity
+      for at least the timeout, starting from the time the
+      get_idle_notification request was received.
+
+      Notification objects do not immediately become not-idle just because user
+      activity was received. Instead, an idled notification is sent when the
+      seat has been idle, and a resumed notification is sent when the seat
+      becomes not idle again after being idle.
+
+      The compositor must send a resumed event before the first idled event.
+      Compositors may choose when to send the resumed event.
+    </description>
+
+    <request name="destroy" type="destructor">
+      <description summary="destroy the notification object">
+        Destroy the notification object.
+      </description>
+    </request>
+
+    <event name="idled">
+      <description summary="notification object is idle">
+        This event is sent when the notification object becomes idle.
+
+        It's a compositor error to send this event twice without a resumed
+        event in between.
+      </description>
+    </event>
+
+    <event name="resumed">
+      <description summary="notification object is not idle">
+        This event is sent when the notification object is no longer idle.
+
+        It's a compositor error to send this event twice without an idled
+        event in between. The first resumed event may be sent at any time
+        after the notification object is created.
+      </description>
+    </event>
+  </interface>
+</protocol>
