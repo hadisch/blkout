@@ -8,6 +8,10 @@ blkout zeigt ein schwarzes Vollbild-Overlay über allen Fenstern an und wird bei
 
 Getestet wurde blkout unter Manjaro Anh-Linh KDE/Plasma 6.5.5 (Wayland).
 
+### Systemvoraussetzungen:
+
+KDE Plasma
+
 ### Bedienung:
 
 Der Aufruf erfolgt mit `blkout -s <sekunden>`. Der Bildschirm wird nach der angegebenen Anzahl von Sekunden schwarz geschaltet. Eine Tastatureingabe oder Mausbewegung „weckt" den Bildschirm wieder auf. `blkout -e` beendet das Programm nach der Ausführung.
@@ -29,6 +33,10 @@ Some graphics cards, especially older ones, have problems reactivating the displ
 blkout displays a black fullscreen overlay on top of all windows and closes it again on any keypress or mouse movement. While not as energy-efficient as true standby, it does the job.
 
 Tested on Manjaro Anh-Linh KDE/Plasma 6.5.5 (Wayland).
+
+### System requirements:
+
+KDE Plasma
 
 ### Usage:
 
